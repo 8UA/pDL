@@ -12,7 +12,7 @@ domain = parse.urlparse(URL).netloc
 filename = basename(path)
 filesize = urllib.request.urlopen(URL)
 
-# Function to convert Bytes from file to Mb, Gb, etc . . .
+# Function to convert Bytes from file to MB, GB, etc . . .
 def format_bytes(size):
     # 2**10 = 1024
     power = 2**10
