@@ -3,7 +3,7 @@ try:
     import urllib, urllib.parse, urllib.request, urllib.error
     from posixpath import basename
     from time import sleep
-    import sys
+    from sys import argv
 except ModuleNotFoundError:
     import subprocess
     print("\nModules are missing, installing requirements. (Make sure your wifi is connected)")
@@ -11,12 +11,12 @@ except ModuleNotFoundError:
     print("Requirements installed, restart the program.")
     exit()
 
-URL = sys.argv[1]
+url = argv[1]
 
 # Fetching file name, file size and destination domain . . .
-filename = basename(URL)
-filesize = urllib.request.urlopen(URL)
-domain = urllib.parse.urlparse(URL).netloc
+filename = basename(url)
+filesize = urllib.request.urlopen(url)
+domain = urllib.parse.urlparse(url).netloc
 
 # Function to convert Bytes from file to MB, GB, etc . . .
 def format_bytes(size):
@@ -32,12 +32,12 @@ def format_bytes(size):
 # Print file info & start download . . .
 try:
     print(f"\nDownloading... | {filename} | Size - {format_bytes(filesize.length)} | From - {domain}")
-    response = download(URL, filename)
+    response = download(url, filename)
 except KeyboardInterrupt:
     print("\n\nKeyboardInterrupt detected, download stopped.")
     sleep(5)
-    sys.exit()
+    exit()
 
 print("\n\nDownload complete! The program will close soon.")
 sleep(5)
-sys.exit()
+exit()
