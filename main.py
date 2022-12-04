@@ -4,7 +4,7 @@ try:
     import urllib, urllib.parse, urllib.request, urllib.error
     from posixpath import basename
     from time import sleep
-    from sys import argv, stdout
+    from sys import argv
 except ModuleNotFoundError:
     import subprocess
     print("\nModules are missing, installing requirements. (Make sure your wifi is connected)")
