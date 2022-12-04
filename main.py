@@ -1,9 +1,10 @@
 try:
-    from wget import download
+    import requests
+    from tqdm import tqdm
     import urllib, urllib.parse, urllib.request, urllib.error
     from posixpath import basename
     from time import sleep
-    from sys import argv
+    from sys import argv, stdout
 except ModuleNotFoundError:
     import subprocess
     print("\nModules are missing, installing requirements. (Make sure your wifi is connected)")
@@ -13,10 +14,36 @@ except ModuleNotFoundError:
 
 url = argv[1]
 
-# Fetching file name, file size and destination domain . . .
-filename = basename(url)
-filesize = urllib.request.urlopen(url)
-domain = urllib.parse.urlparse(url).netloc
+def download_file():
+    # Start download and show progress bar . . .
+    response = requests.get(url, stream=True)
+
+    # Fetching file name, file size and destination domain . . .
+    filename = basename(url)
+    total_size_in_bytes= int(response.headers.get('content-length', 0))
+    block_size = 1024 # 1 Kibibyte
+    domain = urllib.parse.urlparse(url).netloc
+
+    print(f"\nDownloading... | {filename} | Size - {format_bytes(total_size_in_bytes)} | From - {domain}")
+    progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
+    
+    # Write file data and update progress bar . . .
+    try:
+        with open(filename, 'wb') as file:
+            for data in response.iter_content(block_size):
+                progress_bar.update(len(data))
+                file.write(data)
+        
+        progress_bar.close()
+
+        if total_size_in_bytes != 0 and progress_bar.n != total_size_in_bytes:
+            print("Something went wrong . . .")
+
+    except KeyboardInterrupt:
+        progress_bar.close()
+        print("\nKeyboardInterrupt detected, download stopped.")
+        sleep(5)
+        exit()
 
 # Function to convert Bytes from file to MB, GB, etc . . .
 def format_bytes(size):
@@ -29,15 +56,9 @@ def format_bytes(size):
         n += 1
     return size, power_labels[n]+'B'
 
-# Print file info & start download . . .
-try:
-    print(f"\nDownloading... | {filename} | Size - {format_bytes(filesize.length)} | From - {domain}")
-    response = download(url, filename)
-except KeyboardInterrupt:
-    print("\n\nKeyboardInterrupt detected, download stopped.")
-    sleep(5)
-    exit()
+# Start download . . .
+download_file()
 
-print("\n\nDownload complete! The program will close soon.")
-sleep(5)
+print("\nDownload complete! The program will close soon.")
+sleep(3)
 exit()
